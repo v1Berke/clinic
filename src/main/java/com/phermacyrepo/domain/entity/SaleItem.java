@@ -1,30 +1,36 @@
-package com.phermacyrepo.domain;
+package com.phermacyrepo.domain.entity;
+import com.phermacyrepo.domain.exceptions.*;
+
 
 public class SaleItem {
-    private int id;
-    private int saleId;
-    private int medicineId;
-    private int quantitySold;
-    private double unitPrice;
 
-    public SaleItem(int id, int saleId, int medicineId, int quantitySold, double unitPrice) {
-        if (id <= 0) throw new IllegalArgumentException("Sale item id must be positive");
-        if (saleId <= 0) throw new IllegalArgumentException("Sale id must be positive");
-        if (medicineId <= 0) throw new IllegalArgumentException("Medicine id must be positive");
-        if (quantitySold <= 0) throw new IllegalArgumentException("Quantity sold must be positive");
-        if (unitPrice <= 0) throw new IllegalArgumentException("Unit price must be positive");
-        this.id = id;
-        this.saleId = saleId;
+    private int id; 
+    private final int medicineId;
+    private int quantity;
+    private final double unitPrice;
+
+    public SaleItem(int medicineId, int quantity, double unitPrice) {
+        if (medicineId <= 0) throw new ValidationException("Invalid medicine id");
+        if (quantity <= 0) throw new ValidationException("Quantity must be positive");
+        if (unitPrice <= 0) throw new ValidationException("Unit price must be positive");
+
         this.medicineId = medicineId;
-        this.quantitySold = quantitySold;
+        this.quantity = quantity;
         this.unitPrice = unitPrice;
     }
 
-    public int getId() {return id;}
-    public int getSaleId() {return saleId;}
-    public int getMedicineId() {return medicineId;}
-    public int getQuantitySold() {return quantitySold;}
-    public double getUnitPrice() {return unitPrice;}
+    void setId(int id) {
+        if (id <= 0) throw new ValidationException("Invalid sale item id");
+        this.id = id;
+    }
 
+    void merge(int additionalQuantity) {
+        if (additionalQuantity <= 0) throw new ValidationException("Invalid quantity");
+        this.quantity += additionalQuantity;
+    }
+
+    public int getId() { return id; }
+    public int getMedicineId() { return medicineId; }
+    public int getQuantity() { return quantity; }
+    public double getUnitPrice() { return unitPrice; }
 }
-

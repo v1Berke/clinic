@@ -18,21 +18,6 @@ public class Sale {
         this.saleDate = saleDate;
         this.items = new ArrayList<>();
     }
-    @Override
-    public String toString() {
-        return "Sale{" + "saleId=" + saleId + ", saleDate=" + saleDate + ", items=" + items + '}';
-    }
-    public int getSaleId() {
-        return saleId;
-    }
-    
-    public LocalDateTime getSaleDate() {
-        return saleDate;
-    }
-    
-    public List<SaleItem> getItems() {
-        return Collections.unmodifiableList(items);
-    }
     
     public void addItem(SaleItem item) {
         if (item == null) throw new IllegalArgumentException("Sale item cannot be null");
@@ -55,4 +40,8 @@ public class Sale {
             .mapToInt(SaleItem::getQuantity)
             .sum();
     }
+
+    public int getSaleId() { return saleId; }
+    public LocalDateTime getSaleDate() { return saleDate; }
+    public List<SaleItem> getItems() { return Collections.unmodifiableList(items); }
 }
