@@ -126,7 +126,7 @@ public class StockMovementDAO {
     }
 
     /**
-     * Get stock movements by type (PURCHASE, SALE, ADJUSTMENT, LOSS).
+     * Get stock movements by type (IN, OUT, CANCEL).
      */
     public List<StockMovement> findByType(StockMovementType type) {
         try {
