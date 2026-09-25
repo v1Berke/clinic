@@ -235,15 +235,7 @@ public class StockMovementDAO {
         StockMovement movement = new StockMovement(
                 medicineId, type, quantity, date, reason
         );
-
-        // Set ID using reflection since setId is package-private
-        try {
-            java.lang.reflect.Field idField = StockMovement.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(movement, rs.getInt("id"));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new SQLException("Failed to set stock movement id: " + e.getMessage(), e);
-        }
+        movement.setId(rs.getInt("id"));
 
         return movement;
     }

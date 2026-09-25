@@ -154,6 +154,32 @@ public class MedicineDAO {
     }
 
     /**
+     * Update all medicine fields.
+     * Service katmani urun bilgisi guncellerken bu metodu kullanir.
+     */
+    public void updateDetails(Medicine medicine) {
+        try {
+            String sql = "UPDATE medicine SET name = ?, barcode = ?, type = ?, expiration_date = ?, " +
+                    "purchase_price = ?, sale_price = ?, stock = ?, active = ? WHERE id = ?";
+
+            dbManager.executeUpdate(sql,
+                    medicine.getName(),
+                    medicine.getBarcode(),
+                    medicine.getType().toString(),
+                    medicine.getExpirationDate(),
+                    medicine.getPurchasePrice(),
+                    medicine.getSalePrice(),
+                    medicine.getStock(),
+                    medicine.isActive() ? 1 : 0,
+                    medicine.getId()
+            );
+
+        } catch (Exception e) {
+            throw new DatabaseException("Failed to update medicine details: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Update medicine stock and active status.
      * NOTE: Only updates stock and active status, not other attributes.
      */
@@ -257,24 +283,8 @@ public class MedicineDAO {
                 name, barcode, type, expirationDate,
                 purchasePrice, salePrice, stock
         );
-
-        // Set ID using reflection since setId is package-private
-        try {
-            java.lang.reflect.Field idField = Medicine.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(medicine, rs.getInt("id"));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new SQLException("Failed to set medicine id: " + e.getMessage(), e);
-        }
-
-        // Set active status using reflection
-        try {
-            java.lang.reflect.Field activeField = Medicine.class.getDeclaredField("active");
-            activeField.setAccessible(true);
-            activeField.set(medicine, rs.getInt("active") == 1);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new SQLException("Failed to set medicine active: " + e.getMessage(), e);
-        }
+        medicine.setId(rs.getInt("id"));
+        medicine.setActive(rs.getInt("active") == 1);
 
         return medicine;
     }

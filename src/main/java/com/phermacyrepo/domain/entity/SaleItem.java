@@ -19,7 +19,7 @@ public class SaleItem {
         this.unitPrice = unitPrice;
     }
 
-    void setId(int id) {
+    public void setId(int id) {
         if (id <= 0) throw new ValidationException("Invalid sale item id");
         this.id = id;
     }

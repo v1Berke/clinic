@@ -10,13 +10,22 @@ public class Sale {
     private LocalDateTime saleDate;
     private List<SaleItem> items;
 
+    public Sale(LocalDateTime saleDate) {
+        this(0, saleDate);
+    }
+
     public Sale(int saleId, LocalDateTime saleDate) {
-        if (saleId <= 0) throw new IllegalArgumentException("Sale id must be positive");
+        if (saleId < 0) throw new IllegalArgumentException("Sale id cannot be negative");
         if (saleDate == null) throw new IllegalArgumentException("Sale date cannot be null");
         if (saleDate.isAfter(LocalDateTime.now())) throw new IllegalArgumentException("Sale date cannot be in the future");
         this.saleId = saleId;
         this.saleDate = saleDate;
         this.items = new ArrayList<>();
+    }
+
+    public void setSaleId(int saleId) {
+        if (saleId <= 0) throw new IllegalArgumentException("Sale id must be positive");
+        this.saleId = saleId;
     }
     
     public void addItem(SaleItem item) {

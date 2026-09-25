@@ -34,7 +34,7 @@ public class StockMovement {
         this.reason = reason;
     }
 
-    void setId(int id) {
+    public void setId(int id) {
         if (id <= 0) throw new ValidationException("Invalid stock movement id");
         this.id = id;
     }

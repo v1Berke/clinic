@@ -51,12 +51,21 @@ public class DTOMapper {
 
     public static SaleDTO toDTO(Sale entity, List<SaleItemDTO> itemDTOs) {
         if (entity == null) return null;
+        List<SaleItemDTO> items = itemDTOs == null ? List.of() : itemDTOs;
+        // Toplamlar DB satirina veya bos entity'ye degil, kalemlere bakilarak
+        // hesaplanir. Boylece SaleDAO mapper'i toplam tasimasa bile DTO dogru olur.
+        double totalPrice = items.stream()
+                .mapToDouble(SaleItemDTO::getTotalPrice)
+                .sum();
+        int totalQuantity = items.stream()
+                .mapToInt(SaleItemDTO::getQuantity)
+                .sum();
         return new SaleDTO(
                 entity.getSaleId(),
                 entity.getSaleDate(),
-                entity.getTotalPrice(),
-                entity.getTotalQuantity(),
-                itemDTOs
+                totalPrice,
+                totalQuantity,
+                items
         );
     }
 

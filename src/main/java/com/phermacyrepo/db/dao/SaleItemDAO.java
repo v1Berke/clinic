@@ -266,15 +266,7 @@ public class SaleItemDAO {
         double unitPrice = rs.getDouble("unit_price");
 
         SaleItem item = new SaleItem(medicineId, quantity, unitPrice);
-
-        // Set ID using reflection since setId is package-private
-        try {
-            java.lang.reflect.Field idField = SaleItem.class.getDeclaredField("id");
-            idField.setAccessible(true);
-            idField.set(item, rs.getInt("id"));
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new SQLException("Failed to set sale item id: " + e.getMessage(), e);
-        }
+        item.setId(rs.getInt("id"));
 
         return item;
     }

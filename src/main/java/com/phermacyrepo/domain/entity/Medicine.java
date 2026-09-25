@@ -5,17 +5,38 @@ import java.time.LocalDate;
 
 public class Medicine {
 
-    private int id; 
-    private final String name;
-    private final String barcode;
-    private final MedicineType type;
-    private final LocalDate expirationDate;
-    private final double purchasePrice;
-    private final double salePrice;
+    private int id;
+    private String name;
+    private String barcode;
+    private MedicineType type;
+    private LocalDate expirationDate;
+    private double purchasePrice;
+    private double salePrice;
     private int stock;
     private boolean active;
 
     public Medicine(
+            String name,
+            String barcode,
+            MedicineType type,
+            LocalDate expirationDate,
+            double purchasePrice,
+            double salePrice,
+            int stock
+    ) {
+        validateFields(name, barcode, type, expirationDate, purchasePrice, salePrice, stock);
+
+        this.name = name;
+        this.barcode = barcode;
+        this.type = type;
+        this.expirationDate = expirationDate;
+        this.purchasePrice = purchasePrice;
+        this.salePrice = salePrice;
+        this.stock = stock;
+        this.active = true;
+    }
+
+    private static void validateFields(
             String name,
             String barcode,
             MedicineType type,
@@ -31,6 +52,22 @@ public class Medicine {
         if (purchasePrice <= 0) throw new ValidationException("Purchase price must be positive");
         if (salePrice <= 0) throw new ValidationException("Sale price must be positive");
         if (stock < 0) throw new ValidationException("Stock cannot be negative");
+    }
+
+    /**
+     * Ilac bilgilerini gunceller. Stok ve aktiflik haric tum alanlar
+     * service katmanindan bu metotla degistirilir (dogudella SQL yok).
+     */
+    public void updateDetails(
+            String name,
+            String barcode,
+            MedicineType type,
+            LocalDate expirationDate,
+            double purchasePrice,
+            double salePrice,
+            int stock
+    ) {
+        validateFields(name, barcode, type, expirationDate, purchasePrice, salePrice, stock);
 
         this.name = name;
         this.barcode = barcode;
@@ -39,12 +76,15 @@ public class Medicine {
         this.purchasePrice = purchasePrice;
         this.salePrice = salePrice;
         this.stock = stock;
-        this.active = true;
     }
 
-    void setId(int id) {
+    public void setId(int id) {
         if (id <= 0) throw new ValidationException("Invalid id");
         this.id = id;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public void decreaseStock(int quantity) {
@@ -58,9 +98,7 @@ public class Medicine {
         stock += quantity;
     }
 
-    public void deactivate() {
-        this.active = false;
-    }
+    public void deactivate() {this.active = false;}
 
     // getters
     public int getId() { return id; }
