@@ -145,6 +145,40 @@ public class SaleItemDAO {
     }
 
     /**
+     * Get distinct sale IDs that contain a specific medicine.
+     */
+    public List<Integer> findSaleIdsByMedicineId(int medicineId) {
+        try {
+            String sql = "SELECT DISTINCT sale_id FROM sale_item WHERE medicine_id = ?";
+
+            ResultSet rs = dbManager.executeQuery(sql, medicineId);
+            List<Integer> saleIds = new ArrayList<>();
+
+            while (rs.next()) {
+                saleIds.add(rs.getInt("sale_id"));
+            }
+
+            rs.close();
+            return saleIds;
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to find sale ids for medicine: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Delete all sale items of a specific medicine.
+     */
+    public void deleteByMedicineId(int medicineId) {
+        try {
+            String sql = "DELETE FROM sale_item WHERE medicine_id = ?";
+            dbManager.executeUpdate(sql, medicineId);
+        } catch (Exception e) {
+            throw new DatabaseException("Failed to delete sale items for medicine: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Get total quantity sold for a specific medicine.
      */
     public int getTotalQuantitySoldByMedicine(int medicineId) {

@@ -49,10 +49,6 @@ public class StockMovementServiceImpl implements StockMovementService {
         String reason = requireNote(note);
 
         Medicine medicine = findMedicine(medicineId);
-        if (!medicine.isActive()) {
-            throw new BusinessRuleException(
-                    "Cannot add stock to deactivated medicine: " + medicine.getName());
-        }
 
         dbManager.beginTransaction();
         try {

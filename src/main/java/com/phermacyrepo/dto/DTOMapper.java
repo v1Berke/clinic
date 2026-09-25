@@ -16,11 +16,9 @@ public class DTOMapper {
                 entity.getName(),
                 entity.getBarcode(),
                 entity.getType(),
-                entity.getExpirationDate(),
                 entity.getPurchasePrice(),
                 entity.getSalePrice(),
-                entity.getStock(),
-                entity.isActive()
+                entity.getStock()
         );
     }
 
@@ -30,7 +28,6 @@ public class DTOMapper {
                 requestDTO.getName(),
                 requestDTO.getBarcode(),
                 requestDTO.getType(),
-                requestDTO.getExpirationDate(),
                 requestDTO.getPurchasePrice(),
                 requestDTO.getSalePrice(),
                 requestDTO.getStock()

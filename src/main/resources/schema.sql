@@ -11,11 +11,9 @@ CREATE TABLE IF NOT EXISTS medicine (
     name TEXT NOT NULL,
     barcode TEXT NOT NULL UNIQUE,
     type TEXT NOT NULL,
-    expiration_date DATE NOT NULL,
     purchase_price REAL NOT NULL,
     sale_price REAL NOT NULL,
     stock INTEGER NOT NULL DEFAULT 0,
-    active INTEGER NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CHECK (purchase_price > 0),
@@ -66,7 +64,6 @@ CREATE TABLE IF NOT EXISTS sale_item (
 
 -- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_medicine_barcode ON medicine(barcode);
-CREATE INDEX IF NOT EXISTS idx_medicine_active ON medicine(active);
 CREATE INDEX IF NOT EXISTS idx_stock_movement_medicine ON stock_movement(medicine_id);
 CREATE INDEX IF NOT EXISTS idx_stock_movement_date ON stock_movement(date);
 CREATE INDEX IF NOT EXISTS idx_sale_date ON sale(sale_date);

@@ -1,0 +1,147 @@
+/* MedVault renk paleti (logo uyumlu):
+   koyu petrol #0E4A56, petrol #1B6270, nane #7FD8C9,
+   zemin #EFF6F4, yazi #12333B, vurgu yesili #0E7C61 */
+
+.root {
+    -fx-font-size: 15px;
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-background-color: #EFF6F4;
+}
+
+/* Ust mod gecis cubugu */
+.nav-bar {
+    -fx-background-color: #0E4A56;
+    -fx-padding: 10 16 10 16;
+    -fx-spacing: 10;
+}
+.nav-title {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+.nav-button {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-min-width: 170px;
+    -fx-min-height: 44px;
+    -fx-background-color: #1B6270;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+}
+.nav-button:selected {
+    -fx-background-color: #7FD8C9;
+    -fx-text-fill: #0B353D;
+}
+
+/* Basliklar */
+.section-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0E4A56;
+}
+.hint-label {
+    -fx-font-size: 15px;
+    -fx-text-fill: #4E6B72;
+}
+.ready-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0E7C61;
+}
+
+/* Barkod alani */
+.barcode-field {
+    -fx-font-size: 20px;
+    -fx-min-height: 54px;
+}
+
+/* Toplam */
+.total-label {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0E4A56;
+}
+.count-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #4E6B72;
+}
+
+/* Butonlar */
+.primary-button {
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+    -fx-min-height: 58px;
+    -fx-min-width: 260px;
+    -fx-background-color: #0E7C61;
+    -fx-text-fill: white;
+    -fx-background-radius: 8;
+}
+.primary-button:disabled {
+    -fx-opacity: 0.45;
+}
+.danger-button {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-min-height: 58px;
+    -fx-min-width: 220px;
+    -fx-background-color: white;
+    -fx-text-fill: #c62828;
+    -fx-border-color: #c62828;
+    -fx-border-width: 2;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+}
+.normal-button {
+    -fx-font-size: 15px;
+    -fx-min-height: 42px;
+    -fx-min-width: 120px;
+}
+.remove-button {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-min-width: 40px;
+    -fx-min-height: 32px;
+    -fx-background-color: #fbe9e7;
+    -fx-text-fill: #c62828;
+    -fx-border-color: #c62828;
+    -fx-border-width: 1;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+}
+
+/* Tablolar */
+.table-view {
+    -fx-font-size: 16px;
+}
+.table-view .column-header .label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+/* Rapor kartlari */
+.report-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10;
+    -fx-border-color: #CFE3DD;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-padding: 14 18 14 18;
+}
+.report-card-title {
+    -fx-font-size: 13px;
+    -fx-text-fill: #4E6B72;
+    -fx-font-weight: bold;
+}
+.report-card-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0E4A56;
+}
+.profit-positive {
+    -fx-text-fill: #0E7C61;
+}
+.subsection-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0E4A56;
+}

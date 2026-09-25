@@ -103,6 +103,29 @@ public class StockMovementDAO {
     }
 
     /**
+     * Get stock movements within a date range.
+     */
+    public List<StockMovement> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+        try {
+            String sql = "SELECT id, medicine_id, type, quantity, date, reason " +
+                    "FROM stock_movement WHERE date BETWEEN ? AND ? ORDER BY date DESC";
+
+            ResultSet rs = dbManager.executeQuery(sql, startDate, endDate);
+            List<StockMovement> movements = new ArrayList<>();
+
+            while (rs.next()) {
+                movements.add(mapResultSetToStockMovement(rs));
+            }
+
+            rs.close();
+            return movements;
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to find stock movements by date range: " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Get all stock movements for a specific medicine.
      */
     public List<StockMovement> findByMedicineId(int medicineId) {

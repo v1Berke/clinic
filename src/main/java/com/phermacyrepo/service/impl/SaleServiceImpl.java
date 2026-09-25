@@ -18,7 +18,6 @@ import com.phermacyrepo.dto.SaleDTO;
 import com.phermacyrepo.dto.SaleItemDTO;
 import com.phermacyrepo.service.SaleService;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -167,15 +166,6 @@ public class SaleServiceImpl implements SaleService {
     }
 
     private void checkSellable(Medicine medicine, int quantity) {
-        if (!medicine.isActive()) {
-            throw new BusinessRuleException(
-                    "Medicine is not active (deactivated): " + medicine.getName());
-        }
-        if (medicine.getExpirationDate() != null
-                && medicine.getExpirationDate().isBefore(LocalDate.now())) {
-            throw new BusinessRuleException(
-                    "Medicine is expired: " + medicine.getName());
-        }
         if (medicine.getStock() < quantity) {
             throw new BusinessRuleException(
                     "Insufficient stock for '" + medicine.getName()

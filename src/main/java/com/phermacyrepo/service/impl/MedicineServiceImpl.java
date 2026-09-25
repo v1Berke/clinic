@@ -1,6 +1,8 @@
 package com.phermacyrepo.service.impl;
 
+import com.phermacyrepo.db.DatabaseManager;
 import com.phermacyrepo.db.dao.MedicineDAO;
+import com.phermacyrepo.db.dao.SaleDAO;
 import com.phermacyrepo.db.dao.SaleItemDAO;
 import com.phermacyrepo.domain.entity.Medicine;
 import com.phermacyrepo.domain.exceptions.BusinessRuleException;
@@ -10,7 +12,6 @@ import com.phermacyrepo.dto.MedicineDTO;
 import com.phermacyrepo.dto.MedicineRequestDTO;
 import com.phermacyrepo.service.MedicineService;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,24 +22,34 @@ import java.util.stream.Collectors;
  */
 public class MedicineServiceImpl implements MedicineService {
 
+    private final DatabaseManager dbManager;
     private final MedicineDAO medicineDAO;
+    private final SaleDAO saleDAO;
     private final SaleItemDAO saleItemDAO;
 
-    public MedicineServiceImpl(MedicineDAO medicineDAO, SaleItemDAO saleItemDAO) {
+    public MedicineServiceImpl(DatabaseManager dbManager, MedicineDAO medicineDAO,
+                               SaleDAO saleDAO, SaleItemDAO saleItemDAO) {
+        if (dbManager == null) {
+            throw new ValidationException("DatabaseManager cannot be null");
+        }
         if (medicineDAO == null) {
             throw new ValidationException("MedicineDAO cannot be null");
+        }
+        if (saleDAO == null) {
+            throw new ValidationException("SaleDAO cannot be null");
         }
         if (saleItemDAO == null) {
             throw new ValidationException("SaleItemDAO cannot be null");
         }
+        this.dbManager = dbManager;
         this.medicineDAO = medicineDAO;
+        this.saleDAO = saleDAO;
         this.saleItemDAO = saleItemDAO;
     }
 
     @Override
     public MedicineDTO createMedicine(MedicineRequestDTO requestDTO) {
         requireRequest(requestDTO);
-        checkNotExpired(requestDTO.getExpirationDate());
 
         if (medicineDAO.existsByBarcode(requestDTO.getBarcode())) {
             throw new BusinessRuleException(
@@ -59,7 +70,6 @@ public class MedicineServiceImpl implements MedicineService {
     public MedicineDTO updateMedicine(int id, MedicineRequestDTO requestDTO) {
         requirePositiveId(id);
         requireRequest(requestDTO);
-        checkNotExpired(requestDTO.getExpirationDate());
 
         Medicine existing = medicineDAO.findById(id)
                 .orElseThrow(() -> new BusinessRuleException(
@@ -76,7 +86,6 @@ public class MedicineServiceImpl implements MedicineService {
                 requestDTO.getName(),
                 requestDTO.getBarcode(),
                 requestDTO.getType(),
-                requestDTO.getExpirationDate(),
                 requestDTO.getPurchasePrice(),
                 requestDTO.getSalePrice(),
                 requestDTO.getStock());
@@ -96,14 +105,27 @@ public class MedicineServiceImpl implements MedicineService {
                 .orElseThrow(() -> new BusinessRuleException(
                         "Medicine not found with id: " + id));
 
-        // Satis gecmisi olan ilac FK RESTRICT yuzunden silinemez,
-        // bu durumda soft-delete (deactivate) uygulanir.
-        if (!saleItemDAO.findByMedicineId(id).isEmpty()) {
-            medicineDAO.deactivate(id);
-            return;
+        // Direkt silme: ilaca ait satis kalemleri once silinir (RESTRICT),
+        // kalemi kalmayan satislar da temizlenir. Tek transaksiyonda.
+        dbManager.beginTransaction();
+        try {
+            List<Integer> saleIds = saleItemDAO.findSaleIdsByMedicineId(id);
+            saleItemDAO.deleteByMedicineId(id);
+            for (int saleId : saleIds) {
+                if (saleItemDAO.countBySaleId(saleId) == 0) {
+                    saleDAO.delete(saleId);
+                }
+            }
+            medicineDAO.delete(id);
+            dbManager.commit();
+        } catch (RuntimeException e) {
+            try {
+                dbManager.rollback();
+            } catch (RuntimeException rollbackError) {
+                // rollback hatasi orijinal hatayi maskelemesin
+            }
+            throw e;
         }
-
-        medicineDAO.delete(id);
     }
 
     @Override
@@ -128,7 +150,7 @@ public class MedicineServiceImpl implements MedicineService {
         if (threshold < 0) {
             throw new ValidationException("Threshold cannot be negative");
         }
-        return medicineDAO.findAllActive().stream()
+        return medicineDAO.findAll().stream()
                 .filter(m -> m.getStock() <= threshold)
                 .map(DTOMapper::toDTO)
                 .collect(Collectors.toList());
@@ -137,13 +159,6 @@ public class MedicineServiceImpl implements MedicineService {
     private void requireRequest(MedicineRequestDTO dto) {
         if (dto == null) {
             throw new ValidationException("Medicine request cannot be null");
-        }
-    }
-
-    private void checkNotExpired(LocalDate expirationDate) {
-        if (expirationDate != null && expirationDate.isBefore(LocalDate.now())) {
-            throw new BusinessRuleException(
-                    "Expiration date cannot be in the past: " + expirationDate);
         }
     }
 

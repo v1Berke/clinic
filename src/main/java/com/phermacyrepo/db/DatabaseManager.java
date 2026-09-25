@@ -120,10 +120,49 @@ public class DatabaseManager {
             
             String schema = loadSchemaFromResource();
             executeSqlScript(schema);
+            dropRemovedColumns();
         } catch (DatabaseException e) {
             throw e;
         } catch (Exception e) {
             throw new DatabaseException("Failed to initialize schema: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Removes retired columns from older databases:
+     * medicine.expiration_date, medicine.active and the medicine_batch table.
+     * Safe to run on every start.
+     */
+    private void dropRemovedColumns() {
+        try {
+            ResultSet columns = executeQuery("PRAGMA table_info(medicine)");
+            boolean hasExpiration = false;
+            boolean hasActive = false;
+            while (columns.next()) {
+                String name = columns.getString("name");
+                if ("expiration_date".equalsIgnoreCase(name)) {
+                    hasExpiration = true;
+                }
+                if ("active".equalsIgnoreCase(name)) {
+                    hasActive = true;
+                }
+            }
+            columns.close();
+
+            try (Statement stmt = connection.createStatement()) {
+                stmt.execute("DROP INDEX IF EXISTS idx_medicine_active");
+                stmt.execute("DROP INDEX IF EXISTS idx_medicine_batch_medicine");
+                stmt.execute("DROP INDEX IF EXISTS idx_medicine_batch_expiration");
+                if (hasExpiration) {
+                    stmt.execute("ALTER TABLE medicine DROP COLUMN expiration_date");
+                }
+                if (hasActive) {
+                    stmt.execute("ALTER TABLE medicine DROP COLUMN active");
+                }
+                stmt.execute("DROP TABLE IF EXISTS medicine_batch");
+            }
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to migrate database: " + e.getMessage(), e);
         }
     }
 

@@ -5,7 +5,6 @@ import com.phermacyrepo.domain.entity.Medicine;
 import com.phermacyrepo.domain.enum_.MedicineType;
 import com.phermacyrepo.domain.exceptions.DatabaseException;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -31,19 +30,17 @@ public class MedicineDAO {
      */
     public int save(Medicine medicine) {
         try {
-            String sql = "INSERT INTO medicine (name, barcode, type, expiration_date, " +
-                    "purchase_price, sale_price, stock, active) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO medicine (name, barcode, type, " +
+                    "purchase_price, sale_price, stock) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)";
 
             ResultSet rs = dbManager.executeInsertAndGetKeys(sql,
                     medicine.getName(),
                     medicine.getBarcode(),
                     medicine.getType().toString(),
-                    medicine.getExpirationDate(),
                     medicine.getPurchasePrice(),
                     medicine.getSalePrice(),
-                    medicine.getStock(),
-                    medicine.isActive() ? 1 : 0
+                    medicine.getStock()
             );
 
             int generatedId = -1;
@@ -64,8 +61,8 @@ public class MedicineDAO {
 
     public Optional<Medicine> findById(int id) {
         try {
-            String sql = "SELECT id, name, barcode, type, expiration_date, " +
-                    "purchase_price, sale_price, stock, active FROM medicine WHERE id = ?";
+            String sql = "SELECT id, name, barcode, type, " +
+                    "purchase_price, sale_price, stock FROM medicine WHERE id = ?";
 
             ResultSet rs = dbManager.executeQuery(sql, id);
 
@@ -88,8 +85,8 @@ public class MedicineDAO {
     
     public Optional<Medicine> findByBarcode(String barcode) {
         try {
-            String sql = "SELECT id, name, barcode, type, expiration_date, " +
-                    "purchase_price, sale_price, stock, active FROM medicine WHERE barcode = ?";
+            String sql = "SELECT id, name, barcode, type, " +
+                    "purchase_price, sale_price, stock FROM medicine WHERE barcode = ?";
 
             ResultSet rs = dbManager.executeQuery(sql, barcode);
 
@@ -112,8 +109,8 @@ public class MedicineDAO {
     
     public List<Medicine> findAll() {
         try {
-            String sql = "SELECT id, name, barcode, type, expiration_date, " +
-                    "purchase_price, sale_price, stock, active FROM medicine";
+            String sql = "SELECT id, name, barcode, type, " +
+                    "purchase_price, sale_price, stock FROM medicine";
 
             ResultSet rs = dbManager.executeQuery(sql);
             List<Medicine> medicines = new ArrayList<>();
@@ -131,46 +128,22 @@ public class MedicineDAO {
     }
 
     
-    //Get all active medicines.
-    
-    public List<Medicine> findAllActive() {
-        try {
-            String sql = "SELECT id, name, barcode, type, expiration_date, " +
-                    "purchase_price, sale_price, stock, active FROM medicine WHERE active = 1";
-
-            ResultSet rs = dbManager.executeQuery(sql);
-            List<Medicine> medicines = new ArrayList<>();
-
-            while (rs.next()) {
-                medicines.add(mapResultSetToMedicine(rs));
-            }
-
-            rs.close();
-            return medicines;
-
-        } catch (SQLException e) {
-            throw new DatabaseException("Failed to find active medicines: " + e.getMessage(), e);
-        }
-    }
-
     /**
      * Update all medicine fields.
      * Service katmani urun bilgisi guncellerken bu metodu kullanir.
      */
     public void updateDetails(Medicine medicine) {
         try {
-            String sql = "UPDATE medicine SET name = ?, barcode = ?, type = ?, expiration_date = ?, " +
-                    "purchase_price = ?, sale_price = ?, stock = ?, active = ? WHERE id = ?";
+            String sql = "UPDATE medicine SET name = ?, barcode = ?, type = ?, " +
+                    "purchase_price = ?, sale_price = ?, stock = ? WHERE id = ?";
 
             dbManager.executeUpdate(sql,
                     medicine.getName(),
                     medicine.getBarcode(),
                     medicine.getType().toString(),
-                    medicine.getExpirationDate(),
                     medicine.getPurchasePrice(),
                     medicine.getSalePrice(),
                     medicine.getStock(),
-                    medicine.isActive() ? 1 : 0,
                     medicine.getId()
             );
 
@@ -180,16 +153,14 @@ public class MedicineDAO {
     }
 
     /**
-     * Update medicine stock and active status.
-     * NOTE: Only updates stock and active status, not other attributes.
+     * Update medicine stock only (entity based).
      */
     public void update(Medicine medicine) {
         try {
-            String sql = "UPDATE medicine SET stock = ?, active = ? WHERE id = ?";
+            String sql = "UPDATE medicine SET stock = ? WHERE id = ?";
 
             dbManager.executeUpdate(sql,
                     medicine.getStock(),
-                    medicine.isActive() ? 1 : 0,
                     medicine.getId()
             );
 
@@ -207,18 +178,6 @@ public class MedicineDAO {
             dbManager.executeUpdate(sql, newStock, medicineId);
         } catch (Exception e) {
             throw new DatabaseException("Failed to update medicine stock: " + e.getMessage(), e);
-        }
-    }
-
-    
-    //Deactivate a medicine.
-    
-    public void deactivate(int medicineId) {
-        try {
-            String sql = "UPDATE medicine SET active = 0 WHERE id = ?";
-            dbManager.executeUpdate(sql, medicineId);
-        } catch (Exception e) {
-            throw new DatabaseException("Failed to deactivate medicine: " + e.getMessage(), e);
         }
     }
 
@@ -273,18 +232,16 @@ public class MedicineDAO {
         String name = rs.getString("name");
         String barcode = rs.getString("barcode");
         String typeStr = rs.getString("type");
-        LocalDate expirationDate = rs.getDate("expiration_date").toLocalDate();
         double purchasePrice = rs.getDouble("purchase_price");
         double salePrice = rs.getDouble("sale_price");
         int stock = rs.getInt("stock");
 
         MedicineType type = MedicineType.valueOf(typeStr);
         Medicine medicine = new Medicine(
-                name, barcode, type, expirationDate,
+                name, barcode, type,
                 purchasePrice, salePrice, stock
         );
         medicine.setId(rs.getInt("id"));
-        medicine.setActive(rs.getInt("active") == 1);
 
         return medicine;
     }

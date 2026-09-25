@@ -33,5 +33,7 @@ Thumbs.db
 *.tmp
 *.swp
 
-### Tests ###
-src/test/
+### Installer build output (jpackage + Inno Setup) ###
+packaging/MedVault/
+packaging/MedVault-Setup-*.exe
+packaging/input/
